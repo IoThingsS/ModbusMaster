@@ -606,7 +606,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   uint32_t u32StartTime;
   uint8_t u8BytesLeft = 8;
   uint8_t u8MBStatus = ku8MBSuccess;
-  
+  digitalWrite(13, HIGH);
   // assemble Modbus Request Application Data Unit
   u8ModbusADU[u8ModbusADUSize++] = _u8MBSlave;
   u8ModbusADU[u8ModbusADUSize++] = u8MBFunction;
@@ -700,7 +700,6 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   u8ModbusADU[u8ModbusADUSize++] = lowByte(u16CRC);
   u8ModbusADU[u8ModbusADUSize++] = highByte(u16CRC);
   u8ModbusADU[u8ModbusADUSize] = 0;
-
   // flush receive buffer before transmitting request
   while (_serial->read() != -1);
 
@@ -716,6 +715,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   
   u8ModbusADUSize = 0;
   _serial->flush();    // flush transmit buffer
+  digitalWrite(13, LOW);
   if (_postTransmission)
   {
     _postTransmission();
@@ -731,6 +731,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
       digitalWrite(__MODBUSMASTER_DEBUG_PIN_A__, true);
 #endif
       u8ModbusADU[u8ModbusADUSize++] = _serial->read();
+      Serial.println(u8ModbusADU[u8ModbusADUSize-1]);
       u8BytesLeft--;
 #if __MODBUSMASTER_DEBUG__
       digitalWrite(__MODBUSMASTER_DEBUG_PIN_A__, false);
